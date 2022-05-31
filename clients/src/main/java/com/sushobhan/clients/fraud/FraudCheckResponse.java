@@ -1,4 +1,4 @@
-package com.sushobhan.customer;
+package com.sushobhan.clients.fraud;
 
 public record FraudCheckResponse(Boolean isFraudster) {
 }
