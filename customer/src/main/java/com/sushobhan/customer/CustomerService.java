@@ -2,10 +2,12 @@ package com.sushobhan.customer;
 
 import com.sushobhan.clients.fraud.FraudCheckResponse;
 import com.sushobhan.clients.fraud.FraudClient;
+import com.sushobhan.clients.fraud.NotificationClient;
+import com.sushobhan.clients.fraud.NotificationRequest;
 import org.springframework.stereotype.Service;
 
 @Service
-public record CustomerService(CustomerRepository customerRepository, FraudClient fraudClient) {
+public record CustomerService(CustomerRepository customerRepository, FraudClient fraudClient, NotificationClient notificationClient) {
     public void registerCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         Customer customer = Customer.builder()
                 .firstName(customerRegistrationRequest.firstName())
@@ -25,6 +27,9 @@ public record CustomerService(CustomerRepository customerRepository, FraudClient
             throw new IllegalStateException("fraudster");
         }
         customerRepository.save(customer);
-        // todo: send notification
+
+        // todo: make it sync i.e add to queue
+        notificationClient.sendNotificationPings(new NotificationRequest(customer.getId(), customer.getEmail(),
+                String.format("Hello %s, Welcome to microservices", customer.getFirstName())));
     }
 }
